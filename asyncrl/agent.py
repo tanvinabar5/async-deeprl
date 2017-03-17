@@ -41,7 +41,7 @@ class QlearningAgent:
             # Zero all actions, except one that was performed
             action_onehot = tf.one_hot(self.action, self.action_size, 1.0, 0.0)
             # Predict expected future reward for performed action
-            q_value = tf.reduce_sum(tf.mul(self.q_values, action_onehot), reduction_indices=1)
+            q_value = tf.reduce_sum(tf.multiply(self.q_values, action_onehot), reduction_indices=1)
             # Define squared mean loss function: (y - y_)^2
             self.loss = tf.reduce_mean(tf.square(self.reward - q_value))
             # Compute gradients w.r.t. weights
