@@ -8,7 +8,7 @@ import numpy as np
 import random
 
 # Predefined custom action space in given games
-__custom_actions__ = {'Breakout-v0': [1, 4, 5], # NoOp,, Right, Left
+__custom_actions__ = {#'Breakout-v0': [1, 4, 5], # NoOp,, Right, Left
                       'Pong-v0': [1, 2, 3], # NoOp,, Right, Left
                       'SpaceInvaders-v0': [1, 2, 3], # NoOp,, Right, Left
                      }

@@ -18,7 +18,7 @@ random.seed(201)  # To reproduce minimum epsilon sampling
 EPS_MIN_SAMPLES = 4 * [0.1] + 3 * [0.01] + 3 * [0.5]
 
 # Configurations
-tf.app.flags.DEFINE_integer("threads", 8, "Number of threads to use")
+tf.app.flags.DEFINE_integer("threads", 16, "Number of threads to use")
 tf.app.flags.DEFINE_boolean("gpu", False, "Use CPU or GPU for training (default is CPU)")
 # Training settings
 tf.app.flags.DEFINE_integer("total_frames", 40000000, "Total frames (across all threads)")
@@ -30,7 +30,7 @@ tf.app.flags.DEFINE_integer("tmax", 5, "Maximum batch size")
 tf.app.flags.DEFINE_integer("action_repeat", 4, "Applies last action to X next frames")
 tf.app.flags.DEFINE_integer("memory_len", 4, "Memory length - number of stacked input images")
 # Environment settings
-tf.app.flags.DEFINE_string("env", 'SpaceInvaders-v0', "Environment name (available all OpenAI Gym environments)")
+tf.app.flags.DEFINE_string("env", 'Breakout-v0', "Environment name (available all OpenAI Gym environments)")
 tf.app.flags.DEFINE_boolean("render", False, "Render frames? Significantly slows down training process")
 tf.app.flags.DEFINE_integer("width", 84, "Screen image width")
 tf.app.flags.DEFINE_integer("height", 84, "Screen image height")
@@ -228,8 +228,8 @@ def run(worker):
                                w=FLAGS.width,
                                channels=FLAGS.memory_len,
                                opt=tf.train.AdamOptimizer(FLAGS.lr))
-        saver = tf.train.Saver(tf.all_variables(), max_to_keep=2)
-        sess.run(tf.initialize_all_variables())
+        saver = tf.train.Saver(tf.global_variables(), max_to_keep=2)
+        sess.run(tf.global_variables_initializer())
         if not os.path.exists(FLAGS.logdir):
             os.makedirs(FLAGS.logdir)
         ckpt = tf.train.latest_checkpoint(FLAGS.logdir)
