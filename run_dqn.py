@@ -12,6 +12,11 @@ from asyncrl.environment import GymWrapperFactory
 from asyncrl.agent import QlearningAgent, AgentSummary
 import time
 import os
+import gym
+import scipy.misc as smp
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 random.seed(201)  # To reproduce minimum epsilon sampling
 # Distribution of epsilon exploration chances (0.1 = 0.4; 0.01 = 0.3; 05 = 0.3)
@@ -39,9 +44,9 @@ tf.app.flags.DEFINE_integer("test_iter", 3, "Number of test iterations. Used for
 tf.app.flags.DEFINE_string("logdir", 'logs/', "Path to the directory used for checkpoints and loggings")
 tf.app.flags.DEFINE_integer("log_interval", 80000, "Log and checkpoint every X frame")
 # Evaluation
-tf.app.flags.DEFINE_boolean("eval", False, "Disables training, evaluates agent's performance")
+tf.app.flags.DEFINE_boolean("eval", True, "Disables training, evaluates agent's performance")
 tf.app.flags.DEFINE_string("evaldir", 'eval/', "Path to the evaluation logging")
-tf.app.flags.DEFINE_integer("eval_iter", 5, "Number of evaluation episodes")
+tf.app.flags.DEFINE_integer("eval_iter", 1, "Number of evaluation episodes")
 # Optimizer
 tf.app.flags.DEFINE_float("lr", 1e-4, "Starting learning rate")
 FLAGS = tf.app.flags.FLAGS
@@ -90,21 +95,37 @@ def evaluate():
         else:
             print('ERROR! No checkpoint found at', FLAGS.logdir)
             return
-        envwrap.env.monitor.start(os.path.join(FLAGS.evaldir, FLAGS.env))
+        #envwrap.env.monitor.start(os.path.join(FLAGS.evaldir, FLAGS.env))
+        envwrap.env = gym.wrappers.Monitor(envwrap.env, os.path.join(FLAGS.evaldir, FLAGS.env))
+
         total_reward = 0
-        for _ in range(FLAGS.eval_iter):
+        for epnum in range(FLAGS.eval_iter):
+            r_max = []
             s = envwrap.reset()
             terminal = False
             while not terminal:
                 reward_per_action = agent.predict_rewards(s)
+                rmax = np.max(reward_per_action)
                 s, r, terminal, info = envwrap.step(np.argmax(reward_per_action), test=True)
+                sreshape = np.transpose(np.reshape(s, (FLAGS.width, FLAGS.height, FLAGS.action_repeat)), [2,0,1])
                 total_reward += r
-                envwrap.render()
-        envwrap.env.monitor.close()
+                r_max.append(rmax)
+                smp.imsave("plots/"+ str(epnum) + "_" + str(len(r_max))+".png", sreshape[0])
+                #envwrap.render()
+            plot(r_max, epnum)
+        envwrap.env.close()
+        
         print('Evaluation finished.')
         print('Average reward per episode: %0.4f' % (total_reward / FLAGS.eval_iter))
 
-
+def plot (r_max, epnum):
+    plt.plot(r_max)
+    plt.xlabel("Time steps")
+    plt.ylabel("Max reward")
+    plt.savefig('plots/' + str(epnum) +'.png')   # save the figure to file
+    plt.xlim(0, len(r_max)-1, 10)
+    plt.close()  
+    
 def test(agent, env, episodes):
     """Tests agent's peformance on given number of games
     :param agent: agent to test

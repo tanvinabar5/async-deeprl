@@ -1,0 +1,3 @@
+model_checkpoint_path: "sess.ckpt-23234075"
+all_model_checkpoint_paths: "sess.ckpt-23151371"
+all_model_checkpoint_paths: "sess.ckpt-23234075"
