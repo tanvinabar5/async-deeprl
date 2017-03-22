@@ -122,8 +122,10 @@ def plot (r_max, epnum):
     plt.plot(r_max)
     plt.xlabel("Time steps")
     plt.ylabel("Max reward")
-    plt.savefig('plots/' + str(epnum) +'.png')   # save the figure to file
-    plt.xlim(0, len(r_max)-1, 10)
+    x_tick_location = np.arange(0, len(r_max)-1, 20)
+    plt.xticks(x_tick_location, x_tick_location)
+    plt.grid()
+    plt.savefig('plots/' + str(epnum) +'.png')   # save the figure to file    
     plt.close()  
     
 def test(agent, env, episodes):
