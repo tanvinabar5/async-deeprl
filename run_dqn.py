@@ -110,22 +110,24 @@ def evaluate():
                 sreshape = np.transpose(np.reshape(s, (FLAGS.width, FLAGS.height, FLAGS.action_repeat)), [2,0,1])
                 total_reward += r
                 r_max.append(rmax)
-                smp.imsave("plots/"+ str(epnum) + "_" + str(len(r_max))+".png", sreshape[0])
+                smp.imsave("plots2/" + str(len(r_max))+"_screen.png", sreshape[2])
+                plot(reward_per_action[:4], len(r_max))
+
                 #envwrap.render()
-            plot(r_max, epnum)
+            #plot(r_max, epnum)
         envwrap.env.close()
         
         print('Evaluation finished.')
         print('Average reward per episode: %0.4f' % (total_reward / FLAGS.eval_iter))
 
-def plot (r_max, epnum):
-    plt.plot(r_max)
-    plt.xlabel("Time steps")
-    plt.ylabel("Max reward")
-    x_tick_location = np.arange(0, len(r_max)-1, 20)
-    plt.xticks(x_tick_location, x_tick_location)
-    plt.grid()
-    plt.savefig('plots/' + str(epnum) +'.png')   # save the figure to file    
+def plot (q_vals, screen_num):
+    plt.bar(range(len(q_vals)), q_vals, alpha=0.5, color=['red', 'green', 'blue', 'yellow'])
+    plt.ylabel("Action-Values")
+    label = ['NOOP', 'FIRE', 'RIGHT', 'LEFT']
+    x_tick_location = list(range(4))
+    plt.xticks(x_tick_location, label, rotation=25)
+    plt.ylim(3, 7)
+    plt.savefig('plots2/' + str(screen_num) +'.png')   # save the figure to file    
     plt.close()  
     
 def test(agent, env, episodes):
