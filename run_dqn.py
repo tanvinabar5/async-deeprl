@@ -111,16 +111,26 @@ def evaluate():
                 total_reward += r
                 r_max.append(rmax)
                 smp.imsave("plots2/" + str(len(r_max))+"_screen.png", sreshape[2])
-                plot(reward_per_action[:4], len(r_max))
+                plot2(reward_per_action[:4], len(r_max))
 
                 #envwrap.render()
-            #plot(r_max, epnum)
+            plot(r_max, epnum)
         envwrap.env.close()
         
         print('Evaluation finished.')
         print('Average reward per episode: %0.4f' % (total_reward / FLAGS.eval_iter))
 
-def plot (q_vals, screen_num):
+def plot (r_max, epnum):
+    plt.plot(r_max)
+    plt.xlabel("Time steps")
+    plt.ylabel("Max reward")
+    x_tick_location = np.arange(0, len(r_max)-1, 20)
+    plt.xticks(x_tick_location, x_tick_location, rotation=25)
+    plt.grid()
+    plt.savefig('plots/' + str(epnum) +'.png')   # save the figure to file    
+    plt.close() 
+    
+def plot2 (q_vals, screen_num):
     plt.bar(range(len(q_vals)), q_vals, alpha=0.5, color=['red', 'green', 'blue', 'yellow'])
     plt.ylabel("Action-Values")
     label = ['NOOP', 'FIRE', 'RIGHT', 'LEFT']
